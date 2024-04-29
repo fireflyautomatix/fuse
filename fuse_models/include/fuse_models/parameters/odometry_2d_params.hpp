@@ -66,11 +66,7 @@ public:
    * @param[in] ns - The parameter namespace to use
    */
   void loadFromROS(
-    fuse_core::node_interfaces::NodeInterfaces<
-      fuse_core::node_interfaces::Base,
-      fuse_core::node_interfaces::Logging,
-      fuse_core::node_interfaces::Parameters
-    > interfaces,
+    fuse_core::node_interfaces::NodeInterfaces interfaces,
     const std::string & ns)
   {
     position_indices = loadSensorConfig<fuse_variables::Position2DStamped>(

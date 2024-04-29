@@ -113,7 +113,7 @@ public:
    * @param[in] graph               The graph used with the optimizer
    */
   BatchOptimizer(
-    fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+    fuse_core::node_interfaces::NodeInterfaces interfaces,
     fuse_core::Graph::UniquePtr graph = nullptr
   );
 

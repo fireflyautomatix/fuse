@@ -47,7 +47,8 @@ TEST(Optimizer, Constructor)
 {
   // Create optimizer:
   auto node = std::make_shared<rclcpp::Node>("example_optimizer_node");
-  ExampleOptimizer optimizer(*node);
+  auto interfaces = fuse_core::node_interfaces::NodeInterfaces(node);
+  ExampleOptimizer optimizer(interfaces);
 
   // Check the motion and sensor models, and publishers were loaded:
   const auto & motion_models = optimizer.getMotionModels();

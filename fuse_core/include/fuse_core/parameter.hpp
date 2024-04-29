@@ -72,14 +72,14 @@ std::string joinParameterName(const std::string & left, const std::string & righ
  */
 template<class T>
 T getParam(
-  node_interfaces::NodeInterfaces<node_interfaces::Parameters> interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   const std::string & parameter_name,
   const T & default_value,
   const rcl_interfaces::msg::ParameterDescriptor & parameter_descriptor =
   rcl_interfaces::msg::ParameterDescriptor(),
   bool ignore_override = false)
 {
-  auto params_interface = interfaces.get_node_parameters_interface();
+  auto params_interface = interfaces.parameters;
   if (params_interface->has_parameter(parameter_name)) {
     return params_interface->get_parameter(parameter_name).get_parameter_value().get<T>();
   } else {
@@ -111,7 +111,7 @@ T getParam(
  */
 template<class T>
 T getParam(
-  node_interfaces::NodeInterfaces<node_interfaces::Parameters> interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   const std::string & parameter_name,
   const rcl_interfaces::msg::ParameterDescriptor & parameter_descriptor =
   rcl_interfaces::msg::ParameterDescriptor(),
@@ -121,7 +121,7 @@ T getParam(
   // NOTE(CH3): For the same reason we can't defer to the overload of getParam
   rclcpp::ParameterValue value{T{}};
   try {
-    return interfaces.get_node_parameters_interface()->declare_parameter(
+    return interfaces.parameters->declare_parameter(
       parameter_name, value.get_type(), parameter_descriptor, ignore_override
     ).get<T>();
   } catch (const rclcpp::ParameterTypeException & ex) {
@@ -164,7 +164,7 @@ list_parameter_override_prefixes(
 */
 std::unordered_set<std::string>
 list_parameter_override_prefixes(
-  node_interfaces::NodeInterfaces<node_interfaces::Parameters> interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   std::string prefix);
 
 /**
@@ -177,11 +177,7 @@ list_parameter_override_prefixes(
  */
 inline
 void getParamRequired(
-  node_interfaces::NodeInterfaces<
-    node_interfaces::Base,
-    node_interfaces::Logging,
-    node_interfaces::Parameters
-  > interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   const std::string & key,
   std::string & value
 )
@@ -192,9 +188,9 @@ void getParamRequired(
   if (value == default_value) {
     const std::string error =
       "Could not find required parameter " + key + " in namespace " +
-      interfaces.get_node_base_interface()->get_namespace();
+      interfaces.base->get_namespace();
 
-    RCLCPP_FATAL_STREAM(interfaces.get_node_logging_interface()->get_logger(), error);
+    RCLCPP_FATAL_STREAM(interfaces.logging->get_logger(), error);
     throw std::runtime_error(error);
   }
 }
@@ -213,10 +209,7 @@ void getParamRequired(
 template<typename T,
   typename = std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value>>
 void getPositiveParam(
-  node_interfaces::NodeInterfaces<
-    node_interfaces::Logging,
-    node_interfaces::Parameters
-  > interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   const std::string & parameter_name,
   T & default_value,
   const bool strict = true
@@ -225,7 +218,7 @@ void getPositiveParam(
   T value = getParam(interfaces, parameter_name, default_value);
   if (value < 0 || (strict && value == 0)) {
     RCLCPP_WARN_STREAM(
-      interfaces.get_node_logging_interface()->get_logger(),
+      interfaces.logging->get_logger(),
       "The requested " << parameter_name.c_str() << " is <" << (strict ? "=" : "")
                        << " 0. Using the default value (" << default_value << ") instead.");
   } else {
@@ -244,10 +237,7 @@ void getPositiveParam(
  *                     is accepted or not
  */
 inline void getPositiveParam(
-  node_interfaces::NodeInterfaces<
-    node_interfaces::Logging,
-    node_interfaces::Parameters
-  > interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   const std::string & parameter_name,
   rclcpp::Duration & default_value, const bool strict = true)
 {
@@ -272,10 +262,7 @@ inline void getPositiveParam(
  */
 template<int Size, typename Scalar = double>
 fuse_core::Matrix<Scalar, Size, Size> getCovarianceDiagonalParam(
-  node_interfaces::NodeInterfaces<
-    node_interfaces::Logging,
-    node_interfaces::Parameters
-  > interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   const std::string & parameter_name,
   Scalar default_value
 )
@@ -312,15 +299,11 @@ fuse_core::Matrix<Scalar, Size, Size> getCovarianceDiagonalParam(
  * @return Loss function or nullptr if the parameter does not exist
  */
 inline fuse_core::Loss::SharedPtr loadLossConfig(
-  node_interfaces::NodeInterfaces<
-    node_interfaces::Base,
-    node_interfaces::Logging,
-    node_interfaces::Parameters
-  > interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   const std::string & name
 )
 {
-  if (!interfaces.get_node_parameters_interface()->has_parameter(
+  if (!interfaces.parameters->has_parameter(
       name + ".type"))
   {
     return {};
@@ -330,7 +313,7 @@ inline fuse_core::Loss::SharedPtr loadLossConfig(
   getParamRequired(interfaces, name + ".type", loss_type);
 
   auto loss = fuse_core::createUniqueLoss(loss_type);
-  loss->initialize(interfaces, interfaces.get_node_base_interface()->get_fully_qualified_name());
+  loss->initialize(interfaces, interfaces.base->get_fully_qualified_name());
 
   return loss;
 }

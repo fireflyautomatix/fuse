@@ -54,7 +54,7 @@ Acceleration2D::Acceleration2D()
 }
 
 void Acceleration2D::initialize(
-  fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+  fuse_core::node_interfaces::NodeInterfaces interfaces,
   const std::string & name,
   fuse_core::TransactionCallback transaction_callback)
 {
@@ -64,8 +64,8 @@ void Acceleration2D::initialize(
 
 void Acceleration2D::onInit()
 {
-  logger_ = interfaces_.get_node_logging_interface()->get_logger();
-  clock_ = interfaces_.get_node_clock_interface()->get_clock();
+  logger_ = interfaces_.logging->get_logger();
+  clock_ = interfaces_.clock->get_clock();
 
   // Read settings from the parameter sever
   device_id_ = fuse_variables::loadDeviceId(interfaces_);
@@ -88,10 +88,7 @@ void Acceleration2D::onInit()
   tf_buffer_ = std::make_unique<tf2_ros::Buffer>(clock_);
   tf_listener_ = std::make_unique<tf2_ros::TransformListener>(
     *tf_buffer_,
-    interfaces_.get_node_base_interface(),
-    interfaces_.get_node_logging_interface(),
-    interfaces_.get_node_parameters_interface(),
-    interfaces_.get_node_topics_interface()
+    false
   );
 }
 
@@ -102,7 +99,7 @@ void Acceleration2D::onStart()
     sub_options.callback_group = cb_group_;
 
     sub_ = rclcpp::create_subscription<geometry_msgs::msg::AccelWithCovarianceStamped>(
-      interfaces_,
+      interfaces_.topics,
       params_.topic,
       params_.queue_size,
       std::bind(

@@ -198,7 +198,7 @@ nav_msgs::msg::Odometry::SharedPtr robotToOdometry(const Robot & state)
  * The state estimator will not run until it has been sent a starting pose.
  */
 void initializeStateEstimation(
-  fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+  fuse_core::node_interfaces::NodeInterfaces interfaces,
   const Robot & state,
   const rclcpp::Clock::SharedPtr & clock,
   const rclcpp::Logger & logger)
@@ -221,15 +221,15 @@ void initializeStateEstimation(
   srv->pose.pose.covariance[35] = 1.0;
 
   auto client = rclcpp::create_client<fuse_msgs::srv::SetPose>(
-    interfaces.get_node_base_interface(),
-    interfaces.get_node_graph_interface(),
-    interfaces.get_node_services_interface(),
+    interfaces.base,
+    interfaces.graph,
+    interfaces.services,
     "/state_estimation/set_pose",
-    rclcpp::ServicesQoS()
-  );
+    rclcpp::ServicesQoS().get_rmw_qos_profile());
+  
 
   while (!client->wait_for_service(std::chrono::seconds(30)) &&
-    interfaces.get_node_base_interface()->get_context()->is_valid())
+    interfaces.base->get_context()->is_valid())
   {
     RCLCPP_WARN_STREAM(
       logger, "Waiting for '" << client->get_service_name() << "' service to become avaiable.");
@@ -241,7 +241,7 @@ void initializeStateEstimation(
     srv->pose.header.stamp = clock->now();
     auto result_future = client->async_send_request(srv);
 
-    if (rclcpp::spin_until_future_complete(interfaces.get_node_base_interface(), result_future) !=
+    if (rclcpp::spin_until_future_complete(interfaces.base, result_future) !=
       rclcpp::FutureReturnCode::SUCCESS)
     {
       RCLCPP_ERROR(logger, "service call failed :(");

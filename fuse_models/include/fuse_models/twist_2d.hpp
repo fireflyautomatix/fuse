@@ -92,7 +92,7 @@ public:
    * @brief Shadowing extension to the AsyncSensorModel::initialize call
    */
   void initialize(
-    fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+    fuse_core::node_interfaces::NodeInterfaces interfaces,
     const std::string & name,
     fuse_core::TransactionCallback transaction_callback) override;
 
@@ -120,14 +120,7 @@ protected:
    */
   void onStop() override;
 
-  fuse_core::node_interfaces::NodeInterfaces<
-    fuse_core::node_interfaces::Base,
-    fuse_core::node_interfaces::Clock,
-    fuse_core::node_interfaces::Logging,
-    fuse_core::node_interfaces::Parameters,
-    fuse_core::node_interfaces::Topics,
-    fuse_core::node_interfaces::Waitables
-  > interfaces_;  //!< Shadows AsyncSensorModel interfaces_
+  fuse_core::node_interfaces::NodeInterfaces interfaces_;  //!< Shadows AsyncSensorModel interfaces_
 
   rclcpp::Clock::SharedPtr clock_;  //!< The sensor model's clock, for timestamping and logging
   rclcpp::Logger logger_;  //!< The sensor model's logger

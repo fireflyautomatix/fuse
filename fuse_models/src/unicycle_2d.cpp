@@ -190,7 +190,7 @@ void Unicycle2D::onGraphUpdate(fuse_core::Graph::ConstSharedPtr graph)
 }
 
 void Unicycle2D::initialize(
-  fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+  fuse_core::node_interfaces::NodeInterfaces interfaces,
   const std::string & name)
 {
   interfaces_ = interfaces;
@@ -199,8 +199,8 @@ void Unicycle2D::initialize(
 
 void Unicycle2D::onInit()
 {
-  logger_ = interfaces_.get_node_logging_interface()->get_logger();
-  clock_ = interfaces_.get_node_clock_interface()->get_clock();
+  logger_ = interfaces_.logging->get_logger();
+  clock_ = interfaces_.clock->get_clock();
 
   std::vector<double> process_noise_diagonal;
   process_noise_diagonal =

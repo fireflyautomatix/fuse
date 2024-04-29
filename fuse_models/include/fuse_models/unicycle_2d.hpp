@@ -93,7 +93,7 @@ public:
    * @brief Shadowing extension to the AsyncMotionModel::initialize call
    */
   void initialize(
-    fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+    fuse_core::node_interfaces::NodeInterfaces interfaces,
     const std::string & name) override;
 
   void print(std::ostream & stream = std::cout) const;
@@ -209,14 +209,7 @@ protected:
     const StateHistoryElement & state1, const StateHistoryElement & state2,
     const fuse_core::Matrix8d & process_noise_covariance);
 
-  fuse_core::node_interfaces::NodeInterfaces<
-    fuse_core::node_interfaces::Base,
-    fuse_core::node_interfaces::Clock,
-    fuse_core::node_interfaces::Logging,
-    fuse_core::node_interfaces::Parameters,
-    fuse_core::node_interfaces::Topics,
-    fuse_core::node_interfaces::Waitables
-  > interfaces_;  //!< Shadows AsyncSensorModel interfaces_
+  fuse_core::node_interfaces::NodeInterfaces interfaces_;  //!< Shadows AsyncSensorModel interfaces_
 
   rclcpp::Clock::SharedPtr clock_;  //!< The sensor model's clock, for timestamping and logging
   rclcpp::Logger logger_;  //!< The sensor model's logger

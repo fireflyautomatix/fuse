@@ -80,7 +80,7 @@ public:
    * @brief Shadowing extension to the AsyncPublisher::initialize call
    */
   void initialize(
-    fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+    fuse_core::node_interfaces::NodeInterfaces interfaces,
     const std::string & name) override;
 
   /**
@@ -102,12 +102,7 @@ public:
     fuse_core::Graph::ConstSharedPtr graph) override;
 
 protected:
-  fuse_core::node_interfaces::NodeInterfaces<
-    fuse_core::node_interfaces::Base,
-    fuse_core::node_interfaces::Parameters,
-    fuse_core::node_interfaces::Topics,
-    fuse_core::node_interfaces::Waitables
-  > interfaces_;  //!< Shadows AsyncPublisher interfaces_
+  fuse_core::node_interfaces::NodeInterfaces interfaces_;  //!< Shadows AsyncPublisher interfaces_
 
   fuse_core::UUID device_id_;  //!< The UUID of the device to be published
   std::string frame_id_;  //!< The name of the frame for this path

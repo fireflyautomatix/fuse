@@ -59,7 +59,7 @@ SerializedPublisher::SerializedPublisher()
 }
 
 void SerializedPublisher::initialize(
-  fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+  fuse_core::node_interfaces::NodeInterfaces interfaces,
   const std::string & name)
 {
   interfaces_ = interfaces;
@@ -94,7 +94,7 @@ void SerializedPublisher::onInit()
 
   if (!graph_throttle_use_wall_time) {
     graph_publisher_throttled_callback_.setClock(
-      interfaces_.get_node_clock_interface()->get_clock());
+      interfaces_.clock->get_clock());
   }
 
   // Advertise the topics
@@ -108,11 +108,11 @@ void SerializedPublisher::onInit()
 
   graph_publisher_ =
     rclcpp::create_publisher<fuse_msgs::msg::SerializedGraph>(
-    interfaces_, "graph", qos,
+    interfaces_.topics, "graph", qos,
     pub_options);
   transaction_publisher_ =
     rclcpp::create_publisher<fuse_msgs::msg::SerializedTransaction>(
-    interfaces_, "transaction", qos,
+    interfaces_.topics, "transaction", qos,
     pub_options);
 }
 

@@ -96,11 +96,7 @@ public:
    * @param[in] node - The node used to load the parameter
    */
   void loadFromROS(
-    fuse_core::node_interfaces::NodeInterfaces<
-      fuse_core::node_interfaces::Base,
-      fuse_core::node_interfaces::Logging,
-      fuse_core::node_interfaces::Parameters
-    > interfaces)
+    fuse_core::node_interfaces::NodeInterfaces interfaces)
   {
     // Read settings from the parameter server
     fuse_core::getPositiveParam(interfaces, "lag_duration", lag_duration);
@@ -114,7 +110,7 @@ public:
     if (optimization_frequency != -1.0) {
       if (optimization_frequency < 0) {
         RCLCPP_WARN_STREAM(
-          interfaces.get_node_logging_interface()->get_logger(),
+          interfaces.logging->get_logger(),
           "The requested optimization_frequency parameter is < 0. Using the optimization_period"
           "parameter instead!");
       }

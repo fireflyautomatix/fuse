@@ -36,7 +36,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC
   fuse_constraints::fuse_constraints
-  fuse_core::fuse_core
+  fuse_core
   fuse_models::fuse_models
   fuse_variables::fuse_variables
   ${nav_msgs_TARGETS}

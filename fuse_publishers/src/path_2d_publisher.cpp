@@ -66,7 +66,7 @@ Path2DPublisher::Path2DPublisher()
 }
 
 void Path2DPublisher::initialize(
-  fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+  fuse_core::node_interfaces::NodeInterfaces interfaces,
   const std::string & name)
 {
   interfaces_ = interfaces;
@@ -96,9 +96,9 @@ void Path2DPublisher::onInit()
   pub_options.callback_group = cb_group_;
 
   path_publisher_ = rclcpp::create_publisher<nav_msgs::msg::Path>(
-    interfaces_, fuse_core::joinTopicName(name_, "path"), 1, pub_options);
+    interfaces_.topics, fuse_core::joinTopicName(name_, "path"), 1, pub_options);
   pose_array_publisher_ = rclcpp::create_publisher<geometry_msgs::msg::PoseArray>(
-    interfaces_, fuse_core::joinTopicName(name_, "pose_array"), 1, pub_options);
+    interfaces_.topics, fuse_core::joinTopicName(name_, "pose_array"), 1, pub_options);
 }
 
 void Path2DPublisher::notifyCallback(

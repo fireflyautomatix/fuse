@@ -60,11 +60,7 @@ struct ParameterBase
    * @param[in] ns - The parameter namespace to use
    */
   virtual void loadFromROS(
-    fuse_core::node_interfaces::NodeInterfaces<
-      fuse_core::node_interfaces::Base,
-      fuse_core::node_interfaces::Logging,
-      fuse_core::node_interfaces::Parameters
-    > interfaces,
+    fuse_core::node_interfaces::NodeInterfaces interfaces,
     const std::string & ns) = 0;
 };
 
@@ -79,7 +75,7 @@ struct ParameterBase
  */
 template<typename T>
 inline std::vector<size_t> loadSensorConfig(
-  fuse_core::node_interfaces::NodeInterfaces<fuse_core::node_interfaces::Parameters> interfaces,
+  fuse_core::node_interfaces::NodeInterfaces interfaces,
   const std::string & name)
 {
   std::vector<std::string> dimensions;

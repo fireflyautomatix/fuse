@@ -53,7 +53,7 @@ PLUGINLIB_EXPORT_CLASS(fuse_tutorials::BeaconPublisher, fuse_core::Publisher);
 namespace fuse_tutorials
 {
 void BeaconPublisher::initialize(
-  fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+  fuse_core::node_interfaces::NodeInterfaces interfaces,
   const std::string & name)
 {
   interfaces_ = interfaces;
@@ -62,7 +62,7 @@ void BeaconPublisher::initialize(
 
 void BeaconPublisher::onInit()
 {
-  clock_ = interfaces_.get_node_clock_interface()->get_clock();
+  clock_ = interfaces_.clock->get_clock();
 
   // Read configuration from the parameter server
   map_frame_id_ = fuse_core::getParam(interfaces_, "map_frame_id", std::string("map"));

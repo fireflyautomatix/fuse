@@ -75,7 +75,7 @@ Unicycle2DIgnition::Unicycle2DIgnition()
 }
 
 void Unicycle2DIgnition::initialize(
-  fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+  fuse_core::node_interfaces::NodeInterfaces interfaces,
   const std::string & name,
   fuse_core::TransactionCallback transaction_callback)
 {
@@ -85,8 +85,8 @@ void Unicycle2DIgnition::initialize(
 
 void Unicycle2DIgnition::onInit()
 {
-  logger_ = interfaces_.get_node_logging_interface()->get_logger();
-  clock_ = interfaces_.get_node_clock_interface()->get_clock();
+  logger_ = interfaces_.logging->get_logger();
+  clock_ = interfaces_.clock->get_clock();
 
   // Read settings from the parameter sever
   device_id_ = fuse_variables::loadDeviceId(interfaces_);
@@ -96,11 +96,11 @@ void Unicycle2DIgnition::onInit()
   // Connect to the reset service
   if (!params_.reset_service.empty()) {
     reset_client_ = rclcpp::create_client<std_srvs::srv::Empty>(
-      interfaces_.get_node_base_interface(),
-      interfaces_.get_node_graph_interface(),
-      interfaces_.get_node_services_interface(),
+      interfaces_.base,
+      interfaces_.graph,
+      interfaces_.services,
       params_.reset_service,
-      rclcpp::ServicesQoS(),
+      rclcpp::ServicesQoS().get_rmw_qos_profile(),
       cb_group_
     );
   }
@@ -109,7 +109,7 @@ void Unicycle2DIgnition::onInit()
   rclcpp::SubscriptionOptions sub_options;
   sub_options.callback_group = cb_group_;
   sub_ = rclcpp::create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(
-    interfaces_,
+    interfaces_.topics,
     params_.topic,
     params_.queue_size,
     std::bind(&Unicycle2DIgnition::subscriberCallback, this, std::placeholders::_1),
@@ -117,29 +117,29 @@ void Unicycle2DIgnition::onInit()
   );
 
   set_pose_service_ = rclcpp::create_service<fuse_msgs::srv::SetPose>(
-    interfaces_.get_node_base_interface(),
-    interfaces_.get_node_services_interface(),
+    interfaces_.base,
+    interfaces_.services,
     fuse_core::joinTopicName(
-      interfaces_.get_node_base_interface()->get_name(),
+      interfaces_.base->get_name(),
       params_.set_pose_service),
     std::bind(
       &Unicycle2DIgnition::setPoseServiceCallback, this, std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3),
-    rclcpp::ServicesQoS(),
+    rclcpp::ServicesQoS().get_rmw_qos_profile(),
     cb_group_
   );
-  set_pose_deprecated_service_ = rclcpp::create_service<fuse_msgs::srv::SetPoseDeprecated>(
-    interfaces_.get_node_base_interface(),
-    interfaces_.get_node_services_interface(),
-    fuse_core::joinTopicName(
-      interfaces_.get_node_base_interface()->get_name(),
-      params_.set_pose_deprecated_service),
-    std::bind(
-      &Unicycle2DIgnition::setPoseDeprecatedServiceCallback, this, std::placeholders::_1,
-      std::placeholders::_2, std::placeholders::_3),
-    rclcpp::ServicesQoS(),
-    cb_group_
-  );
+  // set_pose_deprecated_service_ = rclcpp::create_service<fuse_msgs::srv::SetPoseDeprecated>(
+  //   interfaces_.base,
+  //   interfaces_.services,
+  //   fuse_core::joinTopicName(
+  //     interfaces_.base->get_name(),
+  //     params_.set_pose_deprecated_service),
+  //   std::bind(
+  //     &Unicycle2DIgnition::setPoseDeprecatedServiceCallback, this, std::placeholders::_1,
+  //     std::placeholders::_2, std::placeholders::_3),
+  //   rclcpp::ServicesQoS(),
+  //   cb_group_
+  // );
 }
 
 void Unicycle2DIgnition::start()
@@ -274,7 +274,7 @@ void Unicycle2DIgnition::process(
   if (!params_.reset_service.empty()) {
     // Wait for the reset service
     while (!reset_client_->wait_for_service(std::chrono::seconds(10)) &&
-      interfaces_.get_node_base_interface()->get_context()->is_valid())
+      interfaces_.base->get_context()->is_valid())
     {
       RCLCPP_WARN_STREAM(
         logger_,

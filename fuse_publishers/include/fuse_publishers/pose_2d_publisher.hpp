@@ -135,7 +135,7 @@ public:
    * @brief Shadowing extension to the AsyncPublisher::initialize call
    */
   void initialize(
-    fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+    fuse_core::node_interfaces::NodeInterfaces interfaces,
     const std::string & name) override;
 
   /**
@@ -180,15 +180,7 @@ public:
   void tfPublishTimerCallback();
 
 protected:
-  fuse_core::node_interfaces::NodeInterfaces<
-    fuse_core::node_interfaces::Base,
-    fuse_core::node_interfaces::Clock,
-    fuse_core::node_interfaces::Logging,
-    fuse_core::node_interfaces::Parameters,
-    fuse_core::node_interfaces::Timers,
-    fuse_core::node_interfaces::Topics,
-    fuse_core::node_interfaces::Waitables
-  > interfaces_;  //!< Shadows AsyncPublisher interfaces_
+  fuse_core::node_interfaces::NodeInterfaces interfaces_;  //!< Shadows AsyncPublisher interfaces_
 
   using Synchronizer = StampedVariableSynchronizer<
     fuse_variables::Orientation2DStamped,

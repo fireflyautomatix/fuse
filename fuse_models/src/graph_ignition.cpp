@@ -53,7 +53,7 @@ GraphIgnition::GraphIgnition()
 }
 
 void GraphIgnition::initialize(
-  fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+  fuse_core::node_interfaces::NodeInterfaces interfaces,
   const std::string & name,
   fuse_core::TransactionCallback transaction_callback)
 {
@@ -63,7 +63,7 @@ void GraphIgnition::initialize(
 
 void GraphIgnition::onInit()
 {
-  logger_ = interfaces_.get_node_logging_interface()->get_logger();
+  logger_ = interfaces_.logging->get_logger();
 
   // Read settings from the parameter sever
   params_.loadFromROS(interfaces_, name_);
@@ -71,11 +71,11 @@ void GraphIgnition::onInit()
   // Connect to the reset service
   if (!params_.reset_service.empty()) {
     reset_client_ = rclcpp::create_client<std_srvs::srv::Empty>(
-      interfaces_.get_node_base_interface(),
-      interfaces_.get_node_graph_interface(),
-      interfaces_.get_node_services_interface(),
+      interfaces_.base,
+      interfaces_.graph,
+      interfaces_.services,
       params_.reset_service,
-      rclcpp::ServicesQoS(),
+      rclcpp::ServicesQoS().get_rmw_qos_profile(),
       cb_group_
     );
   }
@@ -84,7 +84,7 @@ void GraphIgnition::onInit()
   rclcpp::SubscriptionOptions sub_options;
   sub_options.callback_group = cb_group_;
   sub_ = rclcpp::create_subscription<fuse_msgs::msg::SerializedGraph>(
-    interfaces_,
+    interfaces_.topics,
     fuse_core::joinTopicName(name_, params_.topic),
     params_.queue_size,
     std::bind(&GraphIgnition::subscriberCallback, this, std::placeholders::_1),
@@ -92,15 +92,15 @@ void GraphIgnition::onInit()
   );
 
   set_graph_service_ = rclcpp::create_service<fuse_msgs::srv::SetGraph>(
-    interfaces_.get_node_base_interface(),
-    interfaces_.get_node_services_interface(),
+    interfaces_.base,
+    interfaces_.services,
     fuse_core::joinTopicName(
-      interfaces_.get_node_base_interface()->get_name(),
+      interfaces_.base->get_name(),
       params_.set_graph_service),
     std::bind(
       &GraphIgnition::setGraphServiceCallback, this, std::placeholders::_1, std::placeholders::_2,
       std::placeholders::_3),
-    rclcpp::ServicesQoS(),
+    rclcpp::ServicesQoS().get_rmw_qos_profile(),
     cb_group_
   );
 }
@@ -175,7 +175,7 @@ void GraphIgnition::process(
   if (!params_.reset_service.empty()) {
     // Wait for the reset service
     while (!reset_client_->wait_for_service(std::chrono::seconds(10)) &&
-      interfaces_.get_node_base_interface()->get_context()->is_valid())
+      interfaces_.base->get_context()->is_valid())
     {
       RCLCPP_WARN_STREAM(
         logger_,

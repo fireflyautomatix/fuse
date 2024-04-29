@@ -48,7 +48,7 @@ namespace fuse_optimizers
 {
 
 BatchOptimizer::BatchOptimizer(
-  fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+  fuse_core::node_interfaces::NodeInterfaces interfaces,
   fuse_core::Graph::UniquePtr graph
 )
 : fuse_optimizers::Optimizer(interfaces, std::move(graph)),
@@ -61,11 +61,11 @@ BatchOptimizer::BatchOptimizer(
 
   // Configure a timer to trigger optimizations
   optimize_timer_ = rclcpp::create_timer(
-    interfaces_,
+    interfaces_.node,
     clock_,
     params_.optimization_period,
     std::bind(&BatchOptimizer::optimizerTimerCallback, this),
-    interfaces_.get_node_base_interface()->get_default_callback_group()
+    interfaces_.base->get_default_callback_group()
   );
 
   // Start the optimization thread
@@ -129,7 +129,7 @@ void BatchOptimizer::applyMotionModelsToQueue()
 void BatchOptimizer::optimizationLoop()
 {
   // Optimize constraints until told to exit
-  while (interfaces_.get_node_base_interface()->get_context()->is_valid()) {
+  while (interfaces_.base->get_context()->is_valid()) {
     // Wait for the next signal to start the next optimization cycle
     {
       std::unique_lock<std::mutex> lock(optimization_requested_mutex_);
@@ -139,13 +139,13 @@ void BatchOptimizer::optimizationLoop()
           /* *INDENT-OFF* */
           return (
             optimization_request_ ||
-            !interfaces_.get_node_base_interface()->get_context()->is_valid()
+            !interfaces_.base->get_context()->is_valid()
           );
           /* *INDENT-ON* */
         });
     }
     // If a shutdown is requested, exit now.
-    if (!interfaces_.get_node_base_interface()->get_context()->is_valid()) {
+    if (!interfaces_.base->get_context()->is_valid()) {
       break;
     }
     // Copy the combined transaction so it can be shared with all the plugins

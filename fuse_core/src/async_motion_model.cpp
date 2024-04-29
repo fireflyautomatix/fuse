@@ -76,7 +76,7 @@ bool AsyncMotionModel::apply(Transaction & transaction)
 }
 
 void AsyncMotionModel::initialize(
-  node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   const std::string & name)
 {
   if (initialized_) {
@@ -87,7 +87,7 @@ void AsyncMotionModel::initialize(
   name_ = name;
   interfaces_ = interfaces;
 
-  auto context = interfaces_.get_node_base_interface()->get_context();
+  auto context = interfaces_.base->get_context();
   auto executor_options = rclcpp::ExecutorOptions();
   executor_options.context = context;
 
@@ -101,9 +101,9 @@ void AsyncMotionModel::initialize(
   callback_queue_ = std::make_shared<CallbackAdapter>(context);
 
   // This callback group MUST be re-entrant in order to support parallelization
-  cb_group_ = interfaces_.get_node_base_interface()->create_callback_group(
+  cb_group_ = interfaces_.base->create_callback_group(
     rclcpp::CallbackGroupType::Reentrant, false);
-  interfaces_.get_node_waitables_interface()->add_waitable(callback_queue_, cb_group_);
+  interfaces_.waitables->add_waitable(callback_queue_, cb_group_);
 
   // Call the derived onInit() function to perform implementation-specific initialization
   onInit();
@@ -111,7 +111,7 @@ void AsyncMotionModel::initialize(
   // Make sure the executor will service the given node
   // We can add this without any guards because the callback group was set to not get automatically
   // added to executors
-  executor_->add_callback_group(cb_group_, interfaces_.get_node_base_interface());
+  executor_->add_callback_group(cb_group_, interfaces_.base);
 
   // Start the executor
   spinner_ = std::thread(
@@ -154,7 +154,7 @@ void AsyncMotionModel::stop()
 {
   // Prefer to call onStop in executor's thread so downstream users don't have
   // to worry about threads in ROS callbacks when there's only 1 thread.
-  if (interfaces_.get_node_base_interface()->get_context()->is_valid()) {
+  if (interfaces_.base->get_context()->is_valid()) {
     auto callback = std::make_shared<CallbackWrapper<void>>(
       std::bind(&AsyncMotionModel::onStop, this)
     );

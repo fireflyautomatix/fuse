@@ -43,11 +43,11 @@ namespace fuse_core
 {
 std::unordered_set<std::string>
 list_parameter_override_prefixes(
-  node_interfaces::NodeInterfaces<node_interfaces::Parameters> interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   std::string prefix)
 {
   const std::map<std::string, rclcpp::ParameterValue> & overrides =
-    interfaces.get_node_parameters_interface()->get_parameter_overrides();
+    interfaces.parameters->get_parameter_overrides();
   return detail::list_parameter_override_prefixes(overrides, prefix);
 }
 

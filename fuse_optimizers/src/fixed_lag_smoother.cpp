@@ -79,7 +79,7 @@ namespace fuse_optimizers
 {
 
 FixedLagSmoother::FixedLagSmoother(
-  fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+  fuse_core::node_interfaces::NodeInterfaces interfaces,
   fuse_core::Graph::UniquePtr graph
 )
 : fuse_optimizers::Optimizer(interfaces, std::move(graph)),
@@ -98,19 +98,19 @@ FixedLagSmoother::FixedLagSmoother(
 
   // Configure a timer to trigger optimizations
   optimize_timer_ = rclcpp::create_timer(
-    interfaces_,
+    interfaces_.node,
     clock_,
     params_.optimization_period,
     std::bind(&FixedLagSmoother::optimizerTimerCallback, this),
-    interfaces_.get_node_base_interface()->get_default_callback_group()
+    interfaces_.base->get_default_callback_group()
   );
 
   // Advertise a service that resets the optimizer to its initial state
   reset_service_server_ = rclcpp::create_service<std_srvs::srv::Empty>(
-    interfaces_.get_node_base_interface(),
-    interfaces_.get_node_services_interface(),
+    interfaces_.base,
+    interfaces_.services,
     fuse_core::joinTopicName(
-      interfaces_.get_node_base_interface()->get_name(),
+      interfaces_.base->get_name(),
       params_.reset_service),
     std::bind(
       &FixedLagSmoother::resetServiceCallback,
@@ -118,8 +118,8 @@ FixedLagSmoother::FixedLagSmoother(
       std::placeholders::_1,
       std::placeholders::_2
     ),
-    rclcpp::ServicesQoS(),
-    interfaces_.get_node_base_interface()->get_default_callback_group()
+    rclcpp::ServicesQoS().get_rmw_qos_profile(),
+    interfaces_.base->get_default_callback_group()
   );
 }
 
@@ -189,11 +189,11 @@ void FixedLagSmoother::optimizationLoop()
       return
         this->optimization_request_ ||
         !this->optimization_running_ ||
-        !interfaces_.get_node_base_interface()->get_context()->is_valid()
+        !interfaces_.base->get_context()->is_valid()
       ;
     };
   // Optimize constraints until told to exit
-  while (interfaces_.get_node_base_interface()->get_context()->is_valid() &&
+  while (interfaces_.base->get_context()->is_valid() &&
     optimization_running_)
   {
     // Wait for the next signal to start the next optimization cycle
@@ -207,7 +207,7 @@ void FixedLagSmoother::optimizationLoop()
     }
     // If a shutdown is requested, exit now.
     if (!optimization_running_ ||
-      !interfaces_.get_node_base_interface()->get_context()->is_valid())
+      !interfaces_.base->get_context()->is_valid())
     {
       break;
     }
@@ -273,7 +273,7 @@ void FixedLagSmoother::optimizationLoop()
       // Compute a transaction that marginalizes out those variables.
       lag_expiration_ = computeLagExpirationTime();
       marginal_transaction_ = fuse_constraints::marginalizeVariables(
-        interfaces_.get_node_base_interface()->get_name(),
+        interfaces_.base->get_name(),
         computeVariablesToMarginalize(lag_expiration_),
         *graph_);
       // Perform any post-marginal cleanup

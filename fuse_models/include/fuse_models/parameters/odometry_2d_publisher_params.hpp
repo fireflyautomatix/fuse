@@ -71,11 +71,7 @@ public:
    * @param[in] ns - The parameter namespace to use
    */
   void loadFromROS(
-    fuse_core::node_interfaces::NodeInterfaces<
-      fuse_core::node_interfaces::Base,
-      fuse_core::node_interfaces::Logging,
-      fuse_core::node_interfaces::Parameters
-    > interfaces,
+    fuse_core::node_interfaces::NodeInterfaces interfaces,
     const std::string & ns)
   {
     publish_tf = fuse_core::getParam(
@@ -187,7 +183,7 @@ public:
 
     if (!frames_valid) {
       RCLCPP_FATAL_STREAM(
-        interfaces.get_node_logging_interface()->get_logger(),
+        interfaces.logging->get_logger(),
         "Invalid frame configuration! Please note:\n"
           << " - The values for map_frame_id, odom_frame_id, and base_link_frame_id must be "
           << "unique\n"

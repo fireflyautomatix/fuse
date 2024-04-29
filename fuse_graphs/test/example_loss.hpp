@@ -60,11 +60,7 @@ public:
   }
 
   void initialize(
-    fuse_core::node_interfaces::NodeInterfaces<
-      fuse_core::node_interfaces::Base,
-      fuse_core::node_interfaces::Logging,
-      fuse_core::node_interfaces::Parameters
-    >/*interfaces*/,
+    fuse_core::node_interfaces::NodeInterfaces /*interfaces*/,
     const std::string & /*name*/) override {}
 
   void print(std::ostream & /*stream = std::cout*/) const override {}

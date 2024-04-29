@@ -70,7 +70,7 @@ Odometry2DPublisher::Odometry2DPublisher()
 }
 
 void Odometry2DPublisher::initialize(
-  fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+  fuse_core::node_interfaces::NodeInterfaces interfaces,
   const std::string & name)
 {
   interfaces_ = interfaces;
@@ -79,10 +79,10 @@ void Odometry2DPublisher::initialize(
 
 void Odometry2DPublisher::onInit()
 {
-  logger_ = interfaces_.get_node_logging_interface()->get_logger();
-  clock_ = interfaces_.get_node_clock_interface()->get_clock();
+  logger_ = interfaces_.logging->get_logger();
+  clock_ = interfaces_.clock->get_clock();
 
-  tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(interfaces_);
+  tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(interfaces_.topics);
 
   // Read settings from the parameter sever
   device_id_ = fuse_variables::loadDeviceId(interfaces_);
@@ -99,10 +99,7 @@ void Odometry2DPublisher::onInit()
 
     tf_listener_ = std::make_unique<tf2_ros::TransformListener>(
       *tf_buffer_,
-      interfaces_.get_node_base_interface(),
-      interfaces_.get_node_logging_interface(),
-      interfaces_.get_node_parameters_interface(),
-      interfaces_.get_node_topics_interface());
+      false);
   }
 
   // Advertise the topics
@@ -110,12 +107,12 @@ void Odometry2DPublisher::onInit()
   pub_options.callback_group = cb_group_;
 
   odom_pub_ = rclcpp::create_publisher<nav_msgs::msg::Odometry>(
-    interfaces_,
+    interfaces_.topics,
     params_.topic,
     params_.queue_size,
     pub_options);
   acceleration_pub_ = rclcpp::create_publisher<geometry_msgs::msg::AccelWithCovarianceStamped>(
-    interfaces_,
+    interfaces_.topics,
     params_.acceleration_topic,
     params_.queue_size,
     pub_options);
@@ -270,7 +267,7 @@ void Odometry2DPublisher::onStart()
 
   // TODO(CH3): Add this to a separate callback group for async behavior
   publish_timer_ = rclcpp::create_timer(
-    interfaces_,
+    interfaces_.node,
     clock_,
     std::chrono::duration<double>(1.0 / params_.publish_frequency),
     std::move(std::bind(&Odometry2DPublisher::publishTimerCallback, this)),
@@ -380,7 +377,7 @@ void Odometry2DPublisher::publishTimerCallback()
 
   // If requested, we need to project our state forward in time using the 2D kinematic model
   if (params_.predict_to_current_time) {
-    rclcpp::Time timer_now = interfaces_.get_node_clock_interface()->get_clock()->now();
+    rclcpp::Time timer_now = interfaces_.clock->get_clock()->now();
     tf2_2d::Vector2 velocity_linear;
     tf2::fromMsg(odom_output.twist.twist.linear, velocity_linear);
 

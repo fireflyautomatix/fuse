@@ -143,7 +143,7 @@ public:
    * @throws runtime_error if already initialized
    */
   void initialize(
-    node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+    node_interfaces::NodeInterfaces interfaces,
     const std::string & name) override;
 
   /**
@@ -195,7 +195,7 @@ protected:
   std::string name_;  //!< The unique name for this motion model instance
 
   //! The node interfaces
-  node_interfaces::NodeInterfaces<node_interfaces::Base, node_interfaces::Waitables> interfaces_;
+  node_interfaces::NodeInterfaces interfaces_;
   rclcpp::CallbackGroup::SharedPtr cb_group_;  //!< Internal re-entrant callback group
 
   //! A single/multi-threaded executor assigned to the local callback queue

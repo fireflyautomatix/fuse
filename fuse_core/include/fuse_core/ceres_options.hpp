@@ -190,11 +190,7 @@ CERES_OPTION_STRING_DEFINITIONS(VisibilityClusteringType)
  */
 template<class T>
 T declareCeresParam(
-  node_interfaces::NodeInterfaces<
-    node_interfaces::Base,
-    node_interfaces::Logging,
-    node_interfaces::Parameters
-  > interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   const std::string & parameter_name,
   const T & default_value,
   const rcl_interfaces::msg::ParameterDescriptor & parameter_descriptor =
@@ -208,7 +204,7 @@ T declareCeresParam(
   T value;
   if (!FromString(string_value, &value)) {
     RCLCPP_WARN_STREAM(
-      interfaces.get_node_logging_interface()->get_logger(),
+      interfaces.logging->get_logger(),
       "The requested " << parameter_name << " (" << string_value
                        << ") is not supported. Using the default value (" << default_string_value
                        << ") instead.");
@@ -227,11 +223,7 @@ T declareCeresParam(
  * @param[in] namespace_string - Period delimited string to prepend to the loaded parameters' names
  */
 void loadCovarianceOptionsFromROS(
-  node_interfaces::NodeInterfaces<
-    node_interfaces::Base,
-    node_interfaces::Logging,
-    node_interfaces::Parameters
-  > interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   ceres::Covariance::Options & covariance_options,
   const std::string & ns = std::string());
 
@@ -244,9 +236,7 @@ void loadCovarianceOptionsFromROS(
  * @param[in] namespace_string - Period delimited string to prepend to the loaded parameters' names
  */
 void loadProblemOptionsFromROS(
-  node_interfaces::NodeInterfaces<
-    node_interfaces::Parameters
-  > interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   ceres::Problem::Options & problem_options,
   const std::string & ns = std::string());
 
@@ -259,11 +249,7 @@ void loadProblemOptionsFromROS(
  * @param[in] namespace_string - Period delimited string to prepend to the loaded parameters' names
  */
 void loadSolverOptionsFromROS(
-  node_interfaces::NodeInterfaces<
-    node_interfaces::Base,
-    node_interfaces::Logging,
-    node_interfaces::Parameters
-  > interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   ceres::Solver::Options & solver_options,
   const std::string & ns = std::string());
 

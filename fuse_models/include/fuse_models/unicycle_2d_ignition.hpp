@@ -109,7 +109,7 @@ public:
    * @brief Shadowing extension to the AsyncSensorModel::initialize call
    */
   void initialize(
-    fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+    fuse_core::node_interfaces::NodeInterfaces interfaces,
     const std::string & name,
     fuse_core::TransactionCallback transaction_callback) override;
 
@@ -185,16 +185,7 @@ protected:
    */
   void sendPrior(const geometry_msgs::msg::PoseWithCovarianceStamped & pose);
 
-  fuse_core::node_interfaces::NodeInterfaces<
-    fuse_core::node_interfaces::Base,
-    fuse_core::node_interfaces::Clock,
-    fuse_core::node_interfaces::Graph,
-    fuse_core::node_interfaces::Logging,
-    fuse_core::node_interfaces::Parameters,
-    fuse_core::node_interfaces::Services,
-    fuse_core::node_interfaces::Topics,
-    fuse_core::node_interfaces::Waitables
-  > interfaces_;  //!< Shadows AsyncSensorModel interfaces_
+  fuse_core::node_interfaces::NodeInterfaces interfaces_;  //!< Shadows AsyncSensorModel interfaces_
 
   std::atomic_bool started_;  //!< Flag indicating the sensor has been started
   bool initial_transaction_sent_;  //!< Flag indicating an initial transaction has been sent already

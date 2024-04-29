@@ -18,7 +18,7 @@
 #include <memory>
 
 
-#include <rclcpp/node_interfaces/node_interfaces.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <rclcpp/node_interfaces/node_base_interface.hpp>
 #include <rclcpp/node_interfaces/node_clock_interface.hpp>
 #include <rclcpp/node_interfaces/node_graph_interface.hpp>
@@ -58,8 +58,36 @@ typedef rclcpp::node_interfaces::NodeTimersInterface Timers;
 typedef rclcpp::node_interfaces::NodeTopicsInterface Topics;
 typedef rclcpp::node_interfaces::NodeWaitablesInterface Waitables;
 
-template<typename ... InterfacesTs>
-using NodeInterfaces = ::rclcpp::node_interfaces::NodeInterfaces<InterfacesTs...>;
+struct NodeInterfaces {
+  NodeInterfaces(){
+  }
+
+  NodeInterfaces(std::shared_ptr<rclcpp::Node> node){
+    node = node;
+    base = node->get_node_base_interface();
+    clock = node->get_node_clock_interface();
+    graph = node->get_node_graph_interface();
+    logging = node->get_node_logging_interface();
+    parameters = node->get_node_parameters_interface();
+    services = node->get_node_services_interface();
+    time_source = node->get_node_time_source_interface();
+    timers = node->get_node_timers_interface();
+    topics = node->get_node_topics_interface();
+    waitables = node->get_node_waitables_interface();
+  }
+  std::shared_ptr<rclcpp::Node> node;
+  std::shared_ptr<Base> base;
+  std::shared_ptr<Clock> clock;
+  std::shared_ptr<Graph> graph;
+  std::shared_ptr<Logging> logging;
+  std::shared_ptr<Parameters> parameters;
+  std::shared_ptr<Services> services;
+  std::shared_ptr<TimeSource> time_source;
+  std::shared_ptr<Timers> timers;
+  std::shared_ptr<Topics> topics;
+  std::shared_ptr<Waitables> waitables;
+};
+
 }  // namespace node_interfaces
 }  // namespace fuse_core
 

@@ -48,7 +48,7 @@ Transaction::Transaction()
 }
 
 void Transaction::initialize(
-  fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+  fuse_core::node_interfaces::NodeInterfaces interfaces,
   const std::string & name,
   fuse_core::TransactionCallback transaction_callback)
 {
@@ -68,7 +68,7 @@ void Transaction::onStart()
   sub_options.callback_group = cb_group_;
 
   sub_ = rclcpp::create_subscription<fuse_msgs::msg::SerializedTransaction>(
-    interfaces_,
+    interfaces_.topics,
     fuse_core::joinTopicName(name_, params_.topic),
     params_.queue_size,
     std::bind(&Transaction::process, this, std::placeholders::_1),

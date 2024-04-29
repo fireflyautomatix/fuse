@@ -49,7 +49,7 @@ PLUGINLIB_EXPORT_CLASS(fuse_tutorials::RangeSensorModel, fuse_core::SensorModel)
 namespace fuse_tutorials
 {
 void RangeSensorModel::initialize(
-  fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+  fuse_core::node_interfaces::NodeInterfaces interfaces,
   const std::string & name,
   fuse_core::TransactionCallback transaction_callback)
 {
@@ -73,7 +73,7 @@ void RangeSensorModel::priorBeaconsCallback(const sensor_msgs::msg::PointCloud2 
 
 void RangeSensorModel::onInit()
 {
-  logger_ = interfaces_.get_node_logging_interface()->get_logger();
+  logger_ = interfaces_.logging->get_logger();
 
   // Read settings from the parameter server, or any other one-time operations. This sensor model
   // doesn't have any user configuration to read. But we do need a copy of the beacon database. We

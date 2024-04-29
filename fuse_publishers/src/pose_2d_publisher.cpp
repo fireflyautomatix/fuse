@@ -114,7 +114,7 @@ Pose2DPublisher::Pose2DPublisher()
 }
 
 void Pose2DPublisher::initialize(
-  fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+  fuse_core::node_interfaces::NodeInterfaces interfaces,
   const std::string & name)
 {
   interfaces_ = interfaces;
@@ -123,10 +123,10 @@ void Pose2DPublisher::initialize(
 
 void Pose2DPublisher::onInit()
 {
-  logger_ = interfaces_.get_node_logging_interface()->get_logger();
-  clock_ = interfaces_.get_node_clock_interface()->get_clock();
+  logger_ = interfaces_.logging->get_logger();
+  clock_ = interfaces_.clock->get_clock();
 
-  tf_publisher_ = std::make_shared<tf2_ros::TransformBroadcaster>(interfaces_);
+  tf_publisher_ = std::make_shared<tf2_ros::TransformBroadcaster>(interfaces_.topics);
 
   // Read configuration from the parameter server
   base_frame_ = fuse_core::getParam(
@@ -189,10 +189,11 @@ void Pose2DPublisher::onInit()
       );
       tf_listener_ = std::make_unique<tf2_ros::TransformListener>(
         *tf_buffer_,
-        interfaces_.get_node_base_interface(),
-        interfaces_.get_node_logging_interface(),
-        interfaces_.get_node_parameters_interface(),
-        interfaces_.get_node_topics_interface()
+        true
+        // interfaces_.base,
+        // interfaces_.logging,
+        // interfaces_,
+        // interfaces_.topics
       );
     }
   }
@@ -202,10 +203,10 @@ void Pose2DPublisher::onInit()
   pub_options.callback_group = cb_group_;
 
   pose_publisher_ = rclcpp::create_publisher<geometry_msgs::msg::PoseStamped>(
-    interfaces_, fuse_core::joinTopicName(name_, "pose"), 1, pub_options);
+    interfaces_.topics, fuse_core::joinTopicName(name_, "pose"), 1, pub_options);
   pose_with_covariance_publisher_ =
     rclcpp::create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>(
-    interfaces_, fuse_core::joinTopicName(name_, "pose_with_covariance"), 1, pub_options);
+    interfaces_.topics, fuse_core::joinTopicName(name_, "pose_with_covariance"), 1, pub_options);
 }
 
 void Pose2DPublisher::onStart()
@@ -232,7 +233,7 @@ void Pose2DPublisher::onStart()
       tf_publish_frequency = default_tf_publish_frequency;
     }
     tf_publish_timer_ = rclcpp::create_timer(
-      interfaces_,
+      interfaces_.node,
       clock_,
       std::chrono::duration<double>(1.0 / tf_publish_frequency),
       std::move(std::bind(&Pose2DPublisher::tfPublishTimerCallback, this)),

@@ -105,7 +105,7 @@ public:
    * @param[in] graph               The graph used with the optimizer
    */
   Optimizer(
-    fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+    fuse_core::node_interfaces::NodeInterfaces interfaces,
     fuse_core::Graph::UniquePtr graph = nullptr
   );
 
@@ -151,7 +151,7 @@ protected:
   //!< sensor -> motion models group
   using AssociatedMotionModels = std::unordered_map<std::string, MotionModelGroup>;
 
-  fuse_core::node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces_;
+  fuse_core::node_interfaces::NodeInterfaces interfaces_;
   rclcpp::Clock::SharedPtr clock_;
   rclcpp::Logger logger_;
 

@@ -53,11 +53,7 @@ namespace fuse_core
 {
 
 void loadCovarianceOptionsFromROS(
-  node_interfaces::NodeInterfaces<
-    node_interfaces::Base,
-    node_interfaces::Logging,
-    node_interfaces::Parameters
-  > interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   ceres::Covariance::Options & covariance_options,
   const std::string & ns)
 {
@@ -116,7 +112,7 @@ void loadCovarianceOptionsFromROS(
 }
 
 void loadProblemOptionsFromROS(
-  node_interfaces::NodeInterfaces<node_interfaces::Parameters> interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   ceres::Problem::Options & problem_options,
   const std::string & ns)
 {
@@ -149,11 +145,7 @@ void loadProblemOptionsFromROS(
 }
 
 void loadSolverOptionsFromROS(
-  node_interfaces::NodeInterfaces<
-    node_interfaces::Base,
-    node_interfaces::Logging,
-    node_interfaces::Parameters
-  > interfaces,
+  node_interfaces::NodeInterfaces interfaces,
   ceres::Solver::Options & solver_options,
   const std::string & ns)
 {
@@ -628,7 +620,7 @@ void loadSolverOptionsFromROS(
     fuse_core::joinParameterName(ns, "trust_region_minimizer_iterations_to_dump"),
     std::vector<int64_t>()
   );
-  std::vector<int64_t> iterations_to_dump_tmp = interfaces.get_node_parameters_interface()
+  std::vector<int64_t> iterations_to_dump_tmp = interfaces.parameters
     ->get_parameter(fuse_core::joinParameterName(ns, "trust_region_minimizer_iterations_to_dump"))
     .get_value<std::vector<int64_t>>();
   if (!iterations_to_dump_tmp.empty()) {
@@ -704,7 +696,7 @@ void loadSolverOptionsFromROS(
   if (!solver_options.IsValid(&error)) {
     throw std::invalid_argument(
             "Invalid solver options in parameter " +
-            std::string(interfaces.get_node_base_interface()->get_namespace()) +
+            std::string(interfaces.base->get_namespace()) +
             ". Error: " + error);
   }
 }

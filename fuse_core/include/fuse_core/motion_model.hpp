@@ -101,7 +101,7 @@ public:
    * @param[in] name A unique name to give this plugin instance
    */
   virtual void initialize(
-    node_interfaces::NodeInterfaces<ALL_FUSE_CORE_NODE_INTERFACES> interfaces,
+    node_interfaces::NodeInterfaces interfaces,
     const std::string & name) = 0;
 
   /**

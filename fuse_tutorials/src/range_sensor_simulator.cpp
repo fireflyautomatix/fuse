@@ -225,7 +225,7 @@ void initializeStateEstimation(
     interfaces.get_node_graph_interface(),
     interfaces.get_node_services_interface(),
     "/state_estimation/set_pose",
-    rclcpp::ServicesQoS()
+    rclcpp::ServicesQoS().get_rmw_qos_profile()
   );
 
   while (!client->wait_for_service(std::chrono::seconds(30)) &&

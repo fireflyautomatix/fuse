@@ -14,8 +14,8 @@
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
 
   <depend>boost</depend>
-  <depend>libceres-dev</depend>
-  <depend>eigen</depend>
+  <build_depend>libceres-dev</build_depend>
+  <build_depend>eigen</build_depend>
 
   <build_depend>fuse_constraints</build_depend>
   <build_depend>fuse_core</build_depend>
@@ -52,6 +52,8 @@
   <exec_depend>tf2_2d</exec_depend>
   <exec_depend>tf2_geometry_msgs</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>libceres</exec_depend>
+
 
   <test_depend>benchmark</test_depend>
   <test_depend>ament_cmake_gtest</test_depend>

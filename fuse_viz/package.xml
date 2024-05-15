@@ -15,7 +15,7 @@
 
   <build_depend>qtbase5-dev</build_depend>
 
-  <depend>eigen</depend>
+  <build_depend>eigen</build_depend>
   <depend>fuse_constraints</depend>
   <depend>fuse_core</depend>
   <depend>fuse_msgs</depend>

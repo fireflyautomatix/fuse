@@ -19,8 +19,8 @@
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
 
   <depend>boost</depend>
-  <depend>libceres-dev</depend>
-  <depend>eigen</depend>
+  <build_depend>libceres-dev</build_depend>
+  <build_depend>eigen</build_depend>
 
   <build_depend>diagnostic_updater</build_depend>
   <build_depend>fuse_constraints</build_depend>
@@ -43,6 +43,7 @@
   <exec_depend>rclcpp</exec_depend>
   <exec_depend>rclcpp_components</exec_depend>
   <exec_depend>std_srvs</exec_depend>
+  <exec_depend>libceres</exec_depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_lint_auto</test_depend>

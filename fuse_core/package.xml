@@ -15,8 +15,8 @@
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
 
   <depend>boost</depend>
-  <depend>eigen</depend>
-  <depend>libceres-dev</depend>
+  <build_depend>eigen</build_depend>
+  <build_depend>libceres-dev</build_depend>
   <depend>libgoogle-glog-dev</depend>
 
   <build_depend>fuse_msgs</build_depend>
@@ -30,6 +30,7 @@
   <exec_depend>rclcpp</exec_depend>
   <exec_depend>rclcpp_components</exec_depend>
   <exec_depend>rcl_interfaces</exec_depend>
+  <exec_depend>libceres</exec_depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_cmake_pytest</test_depend>

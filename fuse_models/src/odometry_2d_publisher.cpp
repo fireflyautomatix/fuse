@@ -99,7 +99,7 @@ void Odometry2DPublisher::onInit()
 
     tf_listener_ = std::make_unique<tf2_ros::TransformListener>(
       *tf_buffer_,
-      false);
+      true);
   }
 
   // Advertise the topics
